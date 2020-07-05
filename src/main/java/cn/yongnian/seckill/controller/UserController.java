@@ -83,7 +83,7 @@ public class UserController {
         List<User> users = new ArrayList<>(produceNum);
 
         /* 写入Txt文件 */
-        File writename = new File(".\\token.txt"); // 相对路径，如果没有则要建立一个新的output。txt文件
+        File writename = new File("./token.txt"); // 相对路径，如果没有则要建立一个新的output。txt文件
         BufferedWriter out;
         try {
             writename.createNewFile(); // 创建新文件

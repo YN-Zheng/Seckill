@@ -60,7 +60,7 @@ public class GoodsService {
         return goodsVo;
     }
 
-    public void reduceStock(GoodsVo goodsVo) {
+    public synchronized void reduceStock(GoodsVo goodsVo) {
         SeckillGoods seckillGoods = new SeckillGoods();
         seckillGoods.setSeckillStock(goodsVo.getSeckillStock()-1);
         SeckillGoodsExample example = new SeckillGoodsExample();

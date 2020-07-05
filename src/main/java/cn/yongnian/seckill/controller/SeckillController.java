@@ -34,9 +34,7 @@ public class SeckillController {
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @RequestMapping("/do_seckill")
-    public String doSeckill(Model model, User user, @RequestParam("goodsId")long goodsId){
-
-
+    public synchronized String doSeckill(Model model, User user, @RequestParam("goodsId")long goodsId){
 
         // 判断是否登陆
         model.addAttribute("user",user);

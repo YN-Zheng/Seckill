@@ -1,6 +1,7 @@
 package cn.yongnian.seckill.controller;
 
 import cn.yongnian.seckill.model.User;
+import cn.yongnian.seckill.redis.GoodsKey;
 import cn.yongnian.seckill.redis.RedisService;
 import cn.yongnian.seckill.redis.UserKey;
 import cn.yongnian.seckill.result.Result;
@@ -14,12 +15,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.spring5.context.webflux.SpringWebFluxContext;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.util.StringUtils;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * 登陆 Controller
@@ -37,23 +46,63 @@ public class GoodsController {
     @Autowired
     GoodsService goodsService;
 
-    @RequestMapping("/to_list")
+    @Autowired
+    ThymeleafViewResolver thymeleafViewResolver;
+
+
+    /**
+     * 5000 * 10
+     * QPS:
+     * 1. 400
+     * 2.
+     *
+     * @param model
+     * @param user
+     * @param response
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/to_list",produces = "text/html")
+    @ResponseBody
     // MODEL and User are both from ArgumentResolver
-    public String toList(Model model, User user) {
-        if(user==null){
-            return "login";
+    public String toList(Model model, User user,
+                         HttpServletResponse response,
+                         HttpServletRequest request
+                         ) {
+        //取缓存
+        String html = redisService.get(GoodsKey.getGoodsList, "", String.class);
+        if(!StringUtils.isEmpty(html)){
+            return html;
         }
         model.addAttribute("user", user);
         List<GoodsVo> goodsVos = goodsService.listGoodsVo();
         model.addAttribute("goods", goodsVos);
 //        System.out.println(System.currentTimeMillis());
-        return "goods_list";
+       // return "goods_list";
+
+        //手动渲染
+        IContext webContext  = new WebContext(request,response,request.getServletContext(),request.getLocale(),model.asMap());
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_list", webContext);
+        if(!StringUtils.isEmpty(html)){
+            redisService.set(GoodsKey.getGoodsList,"",html);
+        }
+        return html;
     }
 
-    @RequestMapping("/to_detail/{goodId}")
+    @RequestMapping(value = "/to_detail/{goodId}",produces = "text/html")
+    @ResponseBody
     public String toGoodDetail(Model model, User user,
+                               HttpServletResponse response,
+                               HttpServletRequest request,
                                @PathVariable("goodId") long goodsId) {
 //        snowflake算法
+        //取缓存
+        String html = redisService.get(GoodsKey.getGoodsDetail, ""+goodsId, String.class);
+        if(!StringUtils.isEmpty(html)){
+            return html;
+        }
+
+
         model.addAttribute("user", user);
         GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
         long startTime = goodsVo.getStartDate().getTime();
@@ -79,8 +128,15 @@ public class GoodsController {
         model.addAttribute("remainSeconds", remainSeconds);
 
 
-        return "goods_detail";
-    }
+        //手动渲染
+        IContext webContext  = new WebContext(request,response,request.getServletContext(),request.getLocale(),model.asMap());
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", webContext);
+        if(!StringUtils.isEmpty(html)){
+            redisService.set(GoodsKey.getGoodsDetail,""+goodsId,html);
+        }
+        return html;
+
+     }
 
 
 }

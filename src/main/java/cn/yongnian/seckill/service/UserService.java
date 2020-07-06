@@ -84,12 +84,9 @@ public class UserService {
         }
         //延长有效期
         User user = redisService.get(UserKey.token, token, User.class);
-        if(user==null){
-            return null;
+        if(user!=null){
+            addCookie(response,user,token);
         }
-        user.setGmtModified(new Date());
-        userMapper.updateByPrimaryKey(user);
-        addCookie(response,user,token);
         return user;
     }
 

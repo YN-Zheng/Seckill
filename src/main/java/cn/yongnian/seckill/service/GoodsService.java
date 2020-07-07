@@ -50,6 +50,7 @@ public class GoodsService {
         if (seckillGoods.isEmpty()) {
             // 没有秒杀信息
         } else if (seckillGoods.size() != 1) {
+            throw new GlobalException(CodeMessage.MULTI_SECKILL_ORDER);
             //多个秒杀
         } else {
             //正常

@@ -65,4 +65,8 @@ public class OrderService {
         seckillOrderMapper.insertSelective(seckillOrder);
         return order;
     }
+
+    public Order getById(long orderId) {
+        return orderMapper.selectByPrimaryKey(orderId);
+    }
 }

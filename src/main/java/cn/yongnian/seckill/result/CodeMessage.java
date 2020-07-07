@@ -24,6 +24,10 @@ public enum  CodeMessage {
     PASSWORD_ERROR(500215,"密码错误"),
     NOT_LOGIN(500516,"没有登陆"),
 
+    //订单模块 5004XX
+    ORDER_NOT_EXIST(500400,"订单不存在"),
+    MULTI_SECKILL_ORDER(500401,"服务端错误: 多个秒杀订单"),
+
     //秒杀模块 5005XX
     NO_STOCK(500501,"该商品无库存,秒杀结束"),
     REPEAT_SECKILL(500502,"您已经成功秒杀该商品, 不能重复购买" )

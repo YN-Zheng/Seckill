@@ -33,19 +33,19 @@
         </tr>
         <tr>
             <td>商品图片</td>
-            <td colspan="3"><img id="goodsImg" width="200" height="200" /></td>
+            <td colspan="3"><img id="goodsImg" width="200" height="200"/></td>
         </tr>
         <tr>
             <td>订单价格</td>
-            <td colspan="3" id="goodsPrice"></td>
+            <td colspan="3" id="orderPrice"></td>
         </tr>
         <tr>
             <td>下单时间</td>
-            <td colspan="3" id="createDate" ></td>
+            <td colspan="3" id="gmtCreate"></td>
         </tr>
         <tr>
             <td>订单状态</td>
-            <td><span id="orderTip" ></span></td>
+            <td><span id="orderTip"></span></td>
             <!--<td>
                 <span if="order.status eq 0">未支付</span>
                 <span if="order.status eq 1">待发货</span>
@@ -55,17 +55,82 @@
                 <span if="order.status eq 5">已完成</span>
             </td>-->
 
-            <td if="order.status eq 0">
+            <td >
                 <button class="btn btn-primary btn-block" type="submit" id="pay_button">立即支付</button>
             </td>
         </tr>
         <tr>
             <td>用户账户</td>
-            <td text="userId"></td>
+            <td id="userId"></td>
+        </tr>
+        <tr>
             <td>用户名称</td>
-            <td text="userNickname"></td>
+            <td id="userNickname"></td>
         </tr>
     </table>
 </div>
 
 </html>
+
+<script>
+
+    $(function () {
+        getOrderDetail();
+    })
+
+
+    /*
+        <!--<td>
+        <span if="order.status eq 0">未支付</span>
+            <span if="order.status eq 1">待发货</span>
+            <span if="order.status eq 2">已发货</span>
+            <span if="order.status eq 3">已收货</span>
+            <span if="order.status eq 4">已退款</span>
+            <span if="order.status eq 5">已完成</span>
+            </td>-->
+    */
+
+    function render(detail) {
+        var good = detail.good;
+        var order = detail.order;
+        if (order.status !== 0 ) {
+            $("#pay_button").attr("disabled", true);
+        }
+        $("#goodsName").text(good.name);
+        $("#goodsImg").attr("src", good.img);
+        $("#orderPrice").text(order.goodsPrice);
+        $("#gmtCreate").text(order.gmtCreate);
+        $("#userId").text(order.userId);
+        var status = order.status;
+        var tip = $("#orderTip");
+        switch(status){
+            case 0: tip.html("未支付"); break;
+            case 1: tip.html("已发货"); break;
+            case 2: tip.html("已收货"); break;
+            case 3: tip.html("已退款"); break;
+            case 4: tip.html("已完成"); break;
+        }
+    }
+
+    function getOrderDetail() {
+        var orderId = g_getQueryString("orderId");
+        $.ajax({
+            url: "/order/detail",
+            type: "GET",
+            data: {
+                orderId: orderId
+            },
+            success: function (data) {
+                if (data.code === 0) {
+                    render(data.data);
+
+                } else {
+                    layer.msg(data.msg)
+                }
+            },
+            error: function () {
+                layer.msg("客户端请求错误");
+            }
+        })
+    }
+</script>

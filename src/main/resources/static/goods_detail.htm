@@ -43,10 +43,8 @@
                 <input id="remainSeconds" type="hidden"/>
             </td>
             <td>
-                <form id="miaoshaForm" method="post" action="/seckill/do_seckill">
-                    <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
-                    <input name="goodsId" id="goodsId"/>
-                </form>
+                <button class="btn btn-primary btn-block" type="submit" id="buyButton" onclick="doSeckill()">立即秒杀</button>
+                <input name="goodsId" id="goodsId"/>
             </td>
         </tr>
         <tr>
@@ -68,6 +66,26 @@
     $(function () {
         getDetail();
     });
+
+    function doSeckill() {
+        $.ajax({
+            url: "/seckill/do_seckill",
+            type: "POST",
+            data: {
+                goodsId: $("#goodsId").val(),
+            },
+            success: function (data) {
+                if (data.code == 0) {
+                    window.location.href = "/seckill_order_detail.htm?orderId=" + data.data.id;
+                } else {
+                    layer.msg(data.msg);
+                }
+            },
+            error: function () {
+                layer.msg("客户端请求有误");
+            }
+        })
+    }
 
     function render(data) {
         var status = data.status;

@@ -4,6 +4,7 @@ import cn.yongnian.seckill.model.Order;
 import cn.yongnian.seckill.model.SeckillOrder;
 import cn.yongnian.seckill.model.User;
 import cn.yongnian.seckill.result.CodeMessage;
+import cn.yongnian.seckill.result.Result;
 import cn.yongnian.seckill.service.GoodsService;
 import cn.yongnian.seckill.service.OrderService;
 import cn.yongnian.seckill.service.SeckillService;
@@ -14,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * TODO
@@ -33,34 +36,33 @@ public class SeckillController {
     SeckillService seckillService;
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
-    @RequestMapping("/do_seckill")
-    public synchronized String doSeckill(Model model, User user, @RequestParam("goodsId")long goodsId){
+    /**
+     * GET POST 有什么区别?
+     * GET: 幂等, 从服务端获取数据, 不会对服务端产生影响
+     */
+    @RequestMapping(value = "/do_seckill",method = RequestMethod.POST)
+    @ResponseBody
+    public synchronized Result<Order> doSeckill(Model model, User user, @RequestParam("goodsId")long goodsId){
 
         // 判断是否登陆
-        model.addAttribute("user",user);
         if(user==null){
-
-            return "login";
+            return Result.error(CodeMessage.SERVER_ERROR);
         }
 
         // 判断库存是否足够
         GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
         if(goodsVo.getSeckillStock()<=0){
-            model.addAttribute("msg",CodeMessage.NO_STOCK.getMsg());
-            return "seckill_fail";
+            return Result.error(CodeMessage.NO_STOCK);
         }
         // 判断该用户是否已经秒杀过该商品
         SeckillOrder order = orderService.getSeckillOrderByUserIdAndGoodId(user.getId(),goodsId);
         if(order != null){
-            model.addAttribute("msg",CodeMessage.REPEAT_SECKILL.getMsg());
-            return "seckill_fail";
+            return Result.error(CodeMessage.REPEAT_SECKILL);
         }
         // 减库存, 下订单, 写入秒杀订单
         Order newOrder = seckillService.seckill(user,goodsVo);
-        model.addAttribute("order",newOrder);
-        model.addAttribute("goods",goodsVo);
         log.info(user.getNickname()+"---"+goodsVo.getSeckillStock());
-        return "seckill_order_detail";
+        return Result.success(newOrder);
 
     }
 }

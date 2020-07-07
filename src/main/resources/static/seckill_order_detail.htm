@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>订单详情</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <!-- jquery -->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css"/>
+    <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" src="/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/jquery-validation/localization/messages_zh.min.js"></script>
+    <!-- layer -->
+    <script type="text/javascript" src="/layer/layer.js"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" src="/js/md5.min.js"></script>
+    <!-- common.js -->
+    <script type="text/javascript" src="/js/common.js"></script>
+
+</head>
+<body>
+</body>
+<div class="panel panel-default">
+    <div class="panel-heading">秒杀商品详情</div>
+
+    <table class="table" id="order_list">
+
+        <tr>
+            <td>商品名称</td>
+            <td colspan="3" id="goodsName"></td>
+        </tr>
+        <tr>
+            <td>商品图片</td>
+            <td colspan="3"><img id="goodsImg" width="200" height="200" /></td>
+        </tr>
+        <tr>
+            <td>订单价格</td>
+            <td colspan="3" id="goodsPrice"></td>
+        </tr>
+        <tr>
+            <td>下单时间</td>
+            <td colspan="3" id="createDate" ></td>
+        </tr>
+        <tr>
+            <td>订单状态</td>
+            <td><span id="orderTip" ></span></td>
+            <!--<td>
+                <span if="order.status eq 0">未支付</span>
+                <span if="order.status eq 1">待发货</span>
+                <span if="order.status eq 2">已发货</span>
+                <span if="order.status eq 3">已收货</span>
+                <span if="order.status eq 4">已退款</span>
+                <span if="order.status eq 5">已完成</span>
+            </td>-->
+
+            <td if="order.status eq 0">
+                <button class="btn btn-primary btn-block" type="submit" id="pay_button">立即支付</button>
+            </td>
+        </tr>
+        <tr>
+            <td>用户账户</td>
+            <td text="userId"></td>
+            <td>用户名称</td>
+            <td text="userNickname"></td>
+        </tr>
+    </table>
+</div>
+
+</html>

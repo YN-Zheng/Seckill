@@ -46,13 +46,13 @@ public class RedisService {
 
     /**
      * 设置对象
-     *
+     * <p>
      * Example: ( in redis-cli )
      * 127.0.0.1:6379> get UserKey:tka084ced1f04746ba8429b2f613a71fcb
      * "{\"avatar\":\"\",\"gmtCreate\":1589214160000,\"gmtModified\":1593770663577,\"id\":18672394517,\"loginCount\":1,\"nickname\":\"\xe5\xb0\x8f\xe7\xb1\xb3\",\"password\":\"b7797cce01b4b131b433b6acf4add449\",\"salt\":\"1a2b3c4d\"}"
-
+     *
      * @param prefix tk
-     * @param key  UUID
+     * @param key    UUID
      * @param value  User
      * @param <T>
      * @return
@@ -98,6 +98,28 @@ public class RedisService {
             // 生成真正的key
             String realKey = prefix.getPrefix() + key;
             return jedis.exists(realKey);
+        } finally {
+            returnToPool(jedis);
+        }
+    }
+
+
+    /**
+     * 删除
+     *
+     * @param prefix
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> boolean delete(KeyPrefix prefix, String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            // 生成真正的key
+            String realKey = prefix.getPrefix() + key;
+            Long del = jedis.del(realKey);
+            return del > 0;
         } finally {
             returnToPool(jedis);
         }

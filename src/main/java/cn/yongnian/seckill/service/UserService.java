@@ -35,8 +35,43 @@ public class UserService {
     @Autowired
     private RedisService redisService;
 
+    /**
+     * 根据用户id获取缓存
+     * 对象级缓存
+     * ----使用其他table, 调用Service原因之一: 可能有缓存
+     * @param id
+     * @return
+     */
     public User getById(Long id) {
-        return userMapper.selectByPrimaryKey(id);
+        // 取缓存
+        User user = redisService.get(UserKey.getById,""+id,User.class);
+        if(user!=null){
+            return user;
+        }
+        // 取数据库
+        user =  userMapper.selectByPrimaryKey(id);
+        if(user !=null){
+            redisService.set(UserKey.getById,""+id,user);
+        }
+        return user;
+    }
+
+    public boolean updatePassword(long id,String token, String passwordNew){
+        // 取user
+        User user = getById(id);
+        if(user == null){
+            throw new GlobalException(CodeMessage.MOBILE_NOTFOUND);
+        }
+        // 仅更新变动字段 mysql
+        User toBeUpdate = new User();
+        toBeUpdate.setId(id);
+        toBeUpdate.setPassword(MD5Util.passwordToDBPassword(passwordNew,user.getSalt()));
+        userMapper.updateByPrimaryKeySelective(toBeUpdate);
+        // 处理缓存
+        redisService.delete(UserKey.getById,""+id);
+        user.setPassword(toBeUpdate.getPassword());
+        redisService.set(UserKey.token,token,user);
+        return true;
     }
 
 

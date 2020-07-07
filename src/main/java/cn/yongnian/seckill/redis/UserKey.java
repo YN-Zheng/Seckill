@@ -11,7 +11,12 @@ public class UserKey extends BasePrefix{
         super(expireSeconds,prefix);
     }
 
+    public UserKey(String prefix){
+        super(prefix);
+    }
+
     public static UserKey token = new UserKey(TOKEN_EXPIRE,"tk");
+    public static UserKey getById = new UserKey("id");
 
 
 

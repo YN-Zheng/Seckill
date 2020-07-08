@@ -42,13 +42,14 @@ public class SeckillController {
      */
     @RequestMapping(value = "/do_seckill",method = RequestMethod.POST)
     @ResponseBody
-    public synchronized Result<Order> doSeckill(Model model, User user, @RequestParam("goodsId")long goodsId){
+    public Result<Order> doSeckill(Model model, User user, @RequestParam("goodsId")long goodsId){
 
         // 判断是否登陆
         if(user==null){
-            return Result.error(CodeMessage.SERVER_ERROR);
+            return Result.error(CodeMessage.NOT_LOGIN);
         }
 
+        // TODO 数据库已经保证数据一致性, 去除以下判断和数据库查询,保留错误信息
         // 判断库存是否足够
         GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
         if(goodsVo.getSeckillStock()<=0){

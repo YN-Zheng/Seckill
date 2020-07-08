@@ -10,6 +10,6 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface SeckillGoodsExtMapper {
 
-    @Update("update seckill_goods set seckill_stock = seckill_stock-1 where goods_id = #{goodsId}")
-    public int reduceStock();
+    @Update("update seckill_goods set seckill_stock = seckill_stock-1 where goods_id = #{goodsId} and seckill_stock > 0")
+    public int reduceStock(SeckillGoods g);
 }

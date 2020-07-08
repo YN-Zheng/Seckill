@@ -65,7 +65,9 @@ public class GoodsService {
         return goodsVo;
     }
 
-    public void reduceStock() {
-        seckillGoodsExtMapper.reduceStock();
+    public void reduceStock(GoodsVo goodsVo) {
+        SeckillGoods g = new SeckillGoods();
+        g.setGoodsId(goodsVo.getId());
+        seckillGoodsExtMapper.reduceStock(g);
     }
 }

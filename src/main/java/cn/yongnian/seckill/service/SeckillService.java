@@ -30,7 +30,7 @@ public class SeckillService {
     @Transactional
     public Order seckill(User user, GoodsVo goodsVo) {
         // 减库存 下订单
-        goodsService.reduceStock(goodsVo);
+        goodsService.reduceStock();
         // 写入秒杀订单
         return orderService.createOrder(user,goodsVo);
     }

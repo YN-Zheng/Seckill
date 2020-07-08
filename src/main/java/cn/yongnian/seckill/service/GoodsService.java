@@ -4,6 +4,7 @@ import cn.yongnian.seckill.dao.GoodsDao;
 import cn.yongnian.seckill.exception.GlobalException;
 import cn.yongnian.seckill.mapper.GoodsExtMapper;
 import cn.yongnian.seckill.mapper.GoodsMapper;
+import cn.yongnian.seckill.mapper.SeckillGoodsExtMapper;
 import cn.yongnian.seckill.mapper.SeckillGoodsMapper;
 import cn.yongnian.seckill.model.Goods;
 import cn.yongnian.seckill.model.GoodsExample;
@@ -25,6 +26,9 @@ import java.util.List;
 public class GoodsService {
     @Autowired
     GoodsExtMapper goodsExtMapper;
+
+    @Autowired
+    SeckillGoodsExtMapper seckillGoodsExtMapper;
 
     @Autowired
     GoodsMapper goodsMapper;
@@ -61,12 +65,7 @@ public class GoodsService {
         return goodsVo;
     }
 
-    public void reduceStock(GoodsVo goodsVo) {
-        SeckillGoods seckillGoods = new SeckillGoods();
-        seckillGoods.setSeckillStock(goodsVo.getSeckillStock()-1);
-        SeckillGoodsExample example = new SeckillGoodsExample();
-        example.createCriteria().andGoodsIdEqualTo(goodsVo.getId());
-
-        seckillGoodsMapper.updateByExampleSelective(seckillGoods,example);
+    public void reduceStock() {
+        seckillGoodsExtMapper.reduceStock();
     }
 }

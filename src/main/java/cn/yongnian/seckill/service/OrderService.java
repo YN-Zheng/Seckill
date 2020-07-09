@@ -54,7 +54,7 @@ public class OrderService {
         order.setStatus((byte) 0); // 新建 未支付
         order.setUserId(user.getId());
 
-        int num = orderMapper.insertSelective(order);
+        orderMapper.insertSelective(order);
         Long id = order.getId();
 
         SeckillOrder seckillOrder = new SeckillOrder();

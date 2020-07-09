@@ -36,7 +36,7 @@ public class GoodsService {
     @Autowired
     SeckillGoodsMapper seckillGoodsMapper;
 
-    public List<GoodsVo> listGoodsVo(){
+    public List<GoodsVo> listGoodsVo() {
         return goodsExtMapper.listGoodsVo();
     }
 
@@ -60,14 +60,15 @@ public class GoodsService {
             //正常
             SeckillGoods seckillGoods1 = seckillGoods.get(0);
             // goodsVo 的 ID 是goods ID
-            BeanUtils.copyProperties(seckillGoods1, goodsVo,"id");
+            BeanUtils.copyProperties(seckillGoods1, goodsVo, "id");
         }
         return goodsVo;
     }
 
-    public void reduceStock(GoodsVo goodsVo) {
+    public boolean reduceStock(GoodsVo goodsVo) {
         SeckillGoods g = new SeckillGoods();
         g.setGoodsId(goodsVo.getId());
-        seckillGoodsExtMapper.reduceStock(g);
+        int ret = seckillGoodsExtMapper.reduceStock(g);
+        return ret > 0;
     }
 }

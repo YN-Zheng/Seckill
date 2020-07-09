@@ -34,6 +34,30 @@ public class SampleController {
     @Autowired
     MQReceiver mqReceiver;
 
+
+    @RequestMapping("/mq/header")
+    @ResponseBody
+    public Result<String> header(){
+        mqSender.sendHeader("hello, immoc");
+        return Result.success(null);
+    }
+
+    //TODO 接口测试: swagger
+    @RequestMapping("/mq/fanout")
+    @ResponseBody
+    public Result<String> fanout(){
+        mqSender.sendFanout("hello, immoc");
+        return Result.success(null);
+    }
+
+    @RequestMapping("/mq/topic")
+    @ResponseBody
+    public Result<String> topic(){
+        mqSender.sendTopic("hello, immoc");
+        return Result.success(null);
+    }
+
+
     @RequestMapping("/mq")
     @ResponseBody
     public Result<String> mq(){

@@ -1,7 +1,8 @@
-/*
 package cn.yongnian.seckill.controller;
 
 import cn.yongnian.seckill.model.User;
+import cn.yongnian.seckill.rabbitmq.MQReceiver;
+import cn.yongnian.seckill.rabbitmq.MQSender;
 import cn.yongnian.seckill.redis.RedisService;
 import cn.yongnian.seckill.redis.UserKey;
 import cn.yongnian.seckill.result.CodeMessage;
@@ -15,10 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import static cn.yongnian.seckill.result.Result.success;
 
-*/
-/**
- * TODO
- *//*
+
 
 @RequestMapping("/demo")
 @Controller
@@ -29,39 +27,29 @@ public class SampleController {
 
     @Autowired
     RedisService redisService;
+
+    @Autowired
+    MQSender mqSender;
+
+    @Autowired
+    MQReceiver mqReceiver;
+
+    @RequestMapping("/mq")
+    @ResponseBody
+    public Result<String> mq(){
+        mqSender.send("hello, immoc");
+        return Result.success(null);
+    }
+
+
+
+
     // 返回界面
     @RequestMapping("/thymeleaf")
-    public String thymeleaf(Model model){
-        model.addAttribute("name","Joshua");
+    public String thymeleaf(Model model) {
+        model.addAttribute("name", "Joshua");
         return "hello";
     }
-
-*/
-/*
-    // 返回对象消息
-    @RequestMapping("/hello/success")
-    @ResponseBody
-    public Result<String> hello(){
-        return Result.error(CodeMessage.SAMPLE_SUCCESS);
-    }
-
-
-    @RequestMapping("/hello/error")
-    @ResponseBody
-    public Result<String> error(){
-        return Result.error(CodeMessage.SAMPLE_ERROR);
-    }
-*//*
-
-
-    //测试Mybatis
-    @RequestMapping("/db/get")
-    @ResponseBody
-    public Result<User> dbGet(){
-        User user1 = userService.getById(18672394517L);
-        return success(user1);
-    }
-
 
     @RequestMapping("/redis/get")
     @ResponseBody
@@ -83,4 +71,3 @@ public class SampleController {
 
 
 }
-*/

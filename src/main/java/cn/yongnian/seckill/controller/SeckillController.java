@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO
@@ -48,6 +50,9 @@ public class SeckillController implements InitializingBean {
     @Autowired
     MQSender mqSender;
 
+
+    private Map<Long,Boolean> localOverMap = new HashMap<>();
+
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     /**
@@ -56,15 +61,21 @@ public class SeckillController implements InitializingBean {
      */
     @RequestMapping(value = "/do_seckill", method = RequestMethod.POST)
     @ResponseBody
-    public Result<Object> doSeckill(Model model, User user, @RequestParam("goodsId") long goodsId) {
+    public Result<Integer> doSeckill(Model model, User user, @RequestParam("goodsId") long goodsId) {
 
         // 判断是否登陆
         if (user == null) {
             return Result.error(CodeMessage.NOT_LOGIN);
         }
+        // 内存标记, 减少Redis访问
+        Boolean over = localOverMap.get(goodsId);
+        if(over){
+            return Result.error(CodeMessage.NO_STOCK);
+        }
         // 预减库存
         Long stock = redisService.decr(GoodsKey.getSeckillGoodsStock, "" + goodsId);
         if (stock < 0) {
+            localOverMap.put(goodsId,true);
             return Result.error(CodeMessage.NO_STOCK);
         }
         // 判断该用户是否已经秒杀过该商品
@@ -102,6 +113,27 @@ public class SeckillController implements InitializingBean {
     }
 
     /**
+     *
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return orderId: 成功   1: 秒杀失败 0: 排队中
+     */
+    @RequestMapping(value = "/result", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<Long> seckillResult(Model model, User user, @RequestParam("goodsId") long goodsId) {
+
+        // 判断是否登陆
+        if (user == null) {
+            return Result.error(CodeMessage.NOT_LOGIN);
+        }
+        // 判断用户是否秒杀到商品
+        long result = seckillService.getSeckillResult(user.getId(),goodsId);
+        return Result.success(result);
+    }
+
+
+    /**
      * 系统初始化, 将商品的秒杀库存加载至redis中
      *
      * @throws Exception
@@ -114,6 +146,7 @@ public class SeckillController implements InitializingBean {
         }
         for (GoodsVo goods : goodsList) {
             redisService.set(GoodsKey.getSeckillGoodsStock, "" + goods.getId(), goods.getSeckillStock());
+            localOverMap.put(goods.getId(),false);
         }
     }
 }

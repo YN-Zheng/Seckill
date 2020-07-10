@@ -12,10 +12,15 @@ public class GoodsKey extends BasePrefix {
     public GoodsKey(int expireSeconds, String prefix) {
         super(expireSeconds, prefix);
     }
+    public GoodsKey(String prefix) {
+        super(prefix);
+    }
 
     public static GoodsKey getGoodsList = new GoodsKey(EXPIRE, "gl");
     public static GoodsKey getGoodsDetail = new GoodsKey(EXPIRE, "gd");
-    public static GoodsKey getSeckillGoodsStock = new GoodsKey(EXPIRE, "gs");
+
+    // 系统预加载stock至Redis中. 永不过期
+    public static GoodsKey getSeckillGoodsStock = new GoodsKey( "gs");
 
 
 }

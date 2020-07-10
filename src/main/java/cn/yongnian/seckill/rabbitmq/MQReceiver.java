@@ -13,6 +13,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * TODO
  */
@@ -34,7 +37,7 @@ public class MQReceiver {
 
     @RabbitListener(queues = MQConfig.SECKILL_QUEUE)
     public void receiveSeckill(String message) {
-        log.info("receive message:" + message);
+        log.info("receive seckill message:" + message);
         SeckillMessage sm = RedisService.StringToBean(message, SeckillMessage.class);
         User user = sm.getUser();
         long goodsId = sm.getGoodsId();

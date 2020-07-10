@@ -34,7 +34,10 @@ public class MQConfig {
     public Queue queue(){
         return new Queue(QUEUE,true);
     }
-
+    @Bean
+    public Queue seckillQueue(){
+        return new Queue(SECKILL_QUEUE,true);
+    }
     /**
      * Topic 模式 交换机Exchange
      * TODO: topic原理

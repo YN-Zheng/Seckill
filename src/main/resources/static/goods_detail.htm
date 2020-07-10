@@ -43,7 +43,8 @@
                 <input id="remainSeconds" type="hidden"/>
             </td>
             <td>
-                <button class="btn btn-primary btn-block" type="submit" id="buyButton" onclick="doSeckill()">立即秒杀</button>
+                <button class="btn btn-primary btn-block" type="submit" id="buyButton" onclick="doSeckill()">立即秒杀
+                </button>
                 <input name="goodsId" id="goodsId"/>
             </td>
         </tr>
@@ -67,6 +68,42 @@
         getDetail();
     });
 
+    function getSeckillResult(goodsId) {
+        g_showLoading();
+        $.ajax({
+            url: "/seckill/result",
+            type: "GET",
+            data: {
+                goodsId: $("#goodsId").val(),
+            },
+            success: function (data) {
+                if (data.code == 0) {
+                    var result = data.data;
+                    if (result < 0) {
+                        layer.msg("秒杀失败");
+                    } else if (result == 0) {//继续轮询
+                        setTimeout(function () {
+                            getSeckillResult(goodsId);
+                        }, 50)
+                    } else {
+                        layer.confirm("恭喜,秒杀成功!查看订单?", {btn: ["确定", "取消"]},
+                            function () {
+                                window.location.href = "/seckill_order_detail.htm?orderId=" + result;
+                            },
+                            function () {
+                                layer.closeAll();
+                            })
+                    }
+                } else {
+                    layer.msg(data.msg);
+                }
+            },
+            error: function () {
+                layer.msg("客户端请求有误");
+            }
+        })
+    }
+
     function doSeckill() {
         $.ajax({
             url: "/seckill/do_seckill",
@@ -76,7 +113,8 @@
             },
             success: function (data) {
                 if (data.code == 0) {
-                    window.location.href = "/seckill_order_detail.htm?orderId=" + data.data.id;
+                    // window.location.href = "/seckill_order_detail.htm?orderId=" + data.data.id;
+                    getSeckillResult($("#goodsId").val())
                 } else {
                     layer.msg(data.msg);
                 }

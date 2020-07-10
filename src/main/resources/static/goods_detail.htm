@@ -43,9 +43,14 @@
                 <input id="remainSeconds" type="hidden"/>
             </td>
             <td>
-                <button class="btn btn-primary btn-block" type="submit" id="buyButton" onclick="doSeckill()">立即秒杀
-                </button>
-                <input name="goodsId" id="goodsId"/>
+                <div class="form-inline">
+                    <img id="verifyCodeImage" width="80" height="32"/>
+                    <input id="verifyCode" class="form-control"/>
+                    <button class="btn btn-primary" type="submit" id="buyButton" onclick="getSeckillPath()">
+                        立即秒杀
+                    </button>
+                    <input name="goodsId" id="goodsId" type="hidden"/>
+                </div>
             </td>
         </tr>
         <tr>
@@ -67,6 +72,24 @@
     $(function () {
         getDetail();
     });
+
+    function getSeckillPath() {
+        var goodsId = $("#goodsId").val();
+        g_showLoading();
+        $.ajax({
+            url: "/seckill/path",
+            type: "GET",
+            data: {
+                goodsId: goodsId
+            },
+            success: function (data) {
+                if (data.code == 0) {
+                    var path = data.data;
+                    doSeckill(path);
+                }
+            }
+        })
+    }
 
     function getSeckillResult(goodsId) {
         g_showLoading();
@@ -104,9 +127,9 @@
         })
     }
 
-    function doSeckill() {
+    function doSeckill(path) {
         $.ajax({
-            url: "/seckill/do_seckill",
+            url: "/seckill/" + path + "/do_seckill",
             type: "POST",
             data: {
                 goodsId: $("#goodsId").val(),
@@ -179,6 +202,8 @@
                 clearTimeout(timeout);
             }
             $("#seckillTip").html("秒杀进行中");
+
+
         } else {//秒杀已经结束
             $("#buyButton").attr("disabled", true);
             $("#seckillTip").html("秒杀已经结束");

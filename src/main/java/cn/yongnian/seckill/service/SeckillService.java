@@ -8,6 +8,8 @@ import cn.yongnian.seckill.model.User;
 import cn.yongnian.seckill.redis.RedisService;
 import cn.yongnian.seckill.redis.SeckillKey;
 import cn.yongnian.seckill.result.CodeMessage;
+import cn.yongnian.seckill.utils.MD5Util;
+import cn.yongnian.seckill.utils.UUIDUtil;
 import cn.yongnian.seckill.vo.GoodsVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +68,18 @@ public class SeckillService {
 
     private boolean getGoodsOver(long goodsId) {
         return redisService.exist(SeckillKey.isGoodsOver,""+goodsId);
+    }
+
+    public String createSeckillPath(Long userId, long goodsId) {
+        String str = MD5Util.md5(UUIDUtil.uuid() + "123456");
+        redisService.set(SeckillKey.getPath, "" + userId + "_" + goodsId, str);
+        return str;
+    }
+    public boolean checkPath(Long userId, long goodsId, String path) {
+        if(path==null){
+            return false;
+        }
+        String pathOld = redisService.get(SeckillKey.getPath, "" + userId + "_" + goodsId, String.class);
+        return path.equals(pathOld);
     }
 }

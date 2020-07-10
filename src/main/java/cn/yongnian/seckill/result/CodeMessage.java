@@ -30,7 +30,8 @@ public enum  CodeMessage {
 
     //秒杀模块 5005XX
     NO_STOCK(500501,"该商品无库存,秒杀结束"),
-    REPEAT_SECKILL(500502,"您已经成功秒杀该商品, 不能重复购买" )
+    REPEAT_SECKILL(500502,"您已经成功秒杀该商品, 不能重复购买" ),
+    WRONG_PATH(500503,"老实秒杀，不许开挂")
     ;
 
     private int code;

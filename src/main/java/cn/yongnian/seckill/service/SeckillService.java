@@ -54,6 +54,8 @@ public class SeckillService {
         }else if(getGoodsOver(goodsId)){
             // 卖完了 没抢到
             return -1;
+        }else if(goodsService.getGoodsVoByGoodsId(goodsId).getSeckillStock()==0){
+            return -1;
         }
         return 0;
     }

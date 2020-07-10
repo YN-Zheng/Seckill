@@ -4,10 +4,14 @@ import cn.yongnian.seckill.exception.GlobalException;
 import cn.yongnian.seckill.mapper.OrderMapper;
 import cn.yongnian.seckill.mapper.SeckillOrderMapper;
 import cn.yongnian.seckill.model.*;
+import cn.yongnian.seckill.redis.GoodsKey;
+import cn.yongnian.seckill.redis.OrderKey;
+import cn.yongnian.seckill.redis.RedisService;
 import cn.yongnian.seckill.result.CodeMessage;
 import cn.yongnian.seckill.vo.GoodsVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,21 +30,34 @@ public class OrderService {
     @Autowired
     OrderMapper orderMapper;
 
+    @Autowired
+    RedisService redisService;
 
+    @Autowired
+    OrderService orderService;
+
+    @Autowired
+    GoodsService goodsService;
 
     public SeckillOrder getSeckillOrderByUserIdAndGoodId(Long userId, long goodsId) {
+        SeckillOrder seckillOrder = redisService.get(OrderKey.getSeckillOrderByUidGid, "" + userId + "_" + goodsId, SeckillOrder.class);
+        if (seckillOrder != null) {
+            return seckillOrder;
+        }
         SeckillOrderExample orderExample = new SeckillOrderExample();
         orderExample.createCriteria().andUserIdEqualTo(userId).andGoodsIdEqualTo(goodsId);
         List<SeckillOrder> seckillOrders = seckillOrderMapper.selectByExample(orderExample);
-        if(seckillOrders==null || seckillOrders.isEmpty()){
+        if (seckillOrders == null || seckillOrders.isEmpty()) {
             return null;
         }
-        return seckillOrders.get(0);
+        seckillOrder = seckillOrders.get(0);
+
+        redisService.set(OrderKey.getSeckillOrderByUidGid, "" + userId + "_" + goodsId, seckillOrder);
+        return seckillOrder;
     }
 
 
-
-//    @Transactional
+    @Transactional
     public Order createOrder(User user, GoodsVo goodsVo) {
         Order order = new Order();
         order.setDeliveryAddressId(0L);
@@ -62,7 +79,15 @@ public class OrderService {
         seckillOrder.setOrderId(id);
         seckillOrder.setUserId(user.getId());
 
-        seckillOrderMapper.insertSelective(seckillOrder);
+        try {
+            seckillOrderMapper.insertSelective(seckillOrder);
+        }catch(DuplicateKeyException e){
+            goodsService.increaseStock(goodsVo);
+            //throw new GlobalException(CodeMessage.REPEAT_SECKILL);
+            return null;
+        }
+        redisService.set(OrderKey.getSeckillOrderByUidGid, "" + user.getId() + "_" + goodsVo.getId(), seckillOrder);
+
         return order;
     }
 

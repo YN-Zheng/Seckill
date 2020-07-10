@@ -71,4 +71,12 @@ public class GoodsService {
         int ret = seckillGoodsExtMapper.reduceStock(g);
         return ret > 0;
     }
+
+
+    public boolean increaseStock(GoodsVo goodsVo) {
+        SeckillGoods g = new SeckillGoods();
+        g.setGoodsId(goodsVo.getId());
+        int ret = seckillGoodsExtMapper.increaseStock(g);
+        return ret > 0;
+    }
 }

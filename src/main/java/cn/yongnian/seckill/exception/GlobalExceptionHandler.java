@@ -21,7 +21,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public Result<String> ExceptionHandler(HttpServletRequest request, Exception e){
         if(e instanceof GlobalException){
-
             return Result.error(((GlobalException) e).getCodeMessage());
         }
         // BindException 参数绑定错误

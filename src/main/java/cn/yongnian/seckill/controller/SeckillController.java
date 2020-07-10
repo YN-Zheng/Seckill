@@ -68,17 +68,19 @@ public class SeckillController implements InitializingBean {
             return Result.error(CodeMessage.NOT_LOGIN);
         }
 
+        // 内存标记, 减少Redis访问
+        Boolean over = localOverMap.get(goodsId);
+        if(over){
+            return Result.error(CodeMessage.NO_STOCK);
+        }
+
         // 判断该用户是否已经秒杀过该商品
         SeckillOrder order = orderService.getSeckillOrderByUserIdAndGoodId(user.getId(),goodsId);
         if(order != null){
             return Result.error(CodeMessage.REPEAT_SECKILL);
         }
 
-        // 内存标记, 减少Redis访问
-        Boolean over = localOverMap.get(goodsId);
-        if(over){
-            return Result.error(CodeMessage.NO_STOCK);
-        }
+
         // 预减库存
         Long stock = redisService.decr(GoodsKey.getSeckillGoodsStock, "" + goodsId);
         if (stock < 0) {

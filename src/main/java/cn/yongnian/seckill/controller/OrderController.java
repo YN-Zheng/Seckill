@@ -10,13 +10,13 @@ import cn.yongnian.seckill.vo.GoodsVo;
 import cn.yongnian.seckill.vo.OrderDetailVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * TODO
+ * Order Controller
+ * 返回订单数据的接口
  */
 @Controller
 @RequestMapping("/order")
@@ -31,9 +31,9 @@ public class OrderController {
 
     @RequestMapping("/detail")
     @ResponseBody
-    public Result<OrderDetailVo> info(Model model, User user,
+    public Result<OrderDetailVo> info(User user,
                                       @RequestParam("orderId") long orderId) {
-        if(user==null){
+        if (user == null) {
             return Result.error(CodeMessage.NOT_LOGIN);
         }
         // TODO check whether the order belongs to the user

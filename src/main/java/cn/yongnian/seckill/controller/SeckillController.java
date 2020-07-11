@@ -1,20 +1,18 @@
 package cn.yongnian.seckill.controller;
 
-import cn.yongnian.seckill.model.Order;
+import cn.yongnian.seckill.access.AccessLimit;
 import cn.yongnian.seckill.model.SeckillOrder;
 import cn.yongnian.seckill.model.User;
 import cn.yongnian.seckill.rabbitmq.MQSender;
 import cn.yongnian.seckill.rabbitmq.SeckillMessage;
+import cn.yongnian.seckill.redis.AccessKey;
 import cn.yongnian.seckill.redis.GoodsKey;
 import cn.yongnian.seckill.redis.RedisService;
-import cn.yongnian.seckill.redis.SeckillKey;
 import cn.yongnian.seckill.result.CodeMessage;
 import cn.yongnian.seckill.result.Result;
 import cn.yongnian.seckill.service.GoodsService;
 import cn.yongnian.seckill.service.OrderService;
 import cn.yongnian.seckill.service.SeckillService;
-import cn.yongnian.seckill.utils.MD5Util;
-import cn.yongnian.seckill.utils.UUIDUtil;
 import cn.yongnian.seckill.vo.GoodsVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +22,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +113,7 @@ public class SeckillController implements InitializingBean {
      * @param goodsId
      * @return orderId: 成功   1: 秒杀失败 0: 排队中
      */
+    @AccessLimit(seconds = 5, maxCount = 10)
     @RequestMapping(value = "/result", method = RequestMethod.GET)
     @ResponseBody
     public Result<Long> seckillResult(Model model, User user, @RequestParam("goodsId") long goodsId) {
@@ -124,17 +128,54 @@ public class SeckillController implements InitializingBean {
     }
 
 
+    @AccessLimit(seconds = 5, maxCount = 5)
     @RequestMapping(value = "/path", method = RequestMethod.GET)
     @ResponseBody
-    public Result<String> getPath(User user, @RequestParam("goodsId") long goodsId) {
+    public Result<String> getPath(User user, @RequestParam("goodsId") long goodsId,
+                                  @RequestParam(value = "verifyCode",defaultValue = "0")Integer verifyCode,
+                                  HttpServletRequest request) {
+
 
         // 判断是否登陆
         if (user == null) {
             return Result.error(CodeMessage.NOT_LOGIN);
         }
+
+        // 查询访问次数。五秒访问五次(在拦截器中)
+
+
+        // 验证码
+        boolean verified = seckillService.checkVerifyCode(user,goodsId,verifyCode);
+        if(!verified){
+            return Result.error(CodeMessage.VERIFY_ERROR);
+        }
         // 生成连接，发送至前端
         String str = seckillService.createSeckillPath(user.getId(), goodsId);
         return Result.success(str);
+    }
+
+
+
+    @RequestMapping(value = "/verifyCode", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getSeckillVerifyCode(HttpServletResponse response,
+                                             User user, @RequestParam("goodsId") long goodsId) {
+
+        // 判断是否登陆
+        if (user == null) {
+            return Result.error(CodeMessage.NOT_LOGIN);
+        }
+        BufferedImage image = seckillService.createSeckillVerifyCode(user,goodsId);
+        try{
+            OutputStream out = response.getOutputStream();
+            ImageIO.write(image,"JPEG",out);
+            out.flush();
+            out.close();
+            return null;
+        }catch(Exception e){
+            e.printStackTrace();
+            return Result.error(CodeMessage.VERIFY_GENERATE_ERROR);
+        }
     }
 
 

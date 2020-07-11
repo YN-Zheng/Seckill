@@ -1,20 +1,17 @@
 package cn.yongnian.seckill.service;
 
-import cn.yongnian.seckill.dao.GoodsDao;
 import cn.yongnian.seckill.exception.GlobalException;
 import cn.yongnian.seckill.mapper.GoodsExtMapper;
 import cn.yongnian.seckill.mapper.GoodsMapper;
 import cn.yongnian.seckill.mapper.SeckillGoodsExtMapper;
 import cn.yongnian.seckill.mapper.SeckillGoodsMapper;
 import cn.yongnian.seckill.model.Goods;
-import cn.yongnian.seckill.model.GoodsExample;
 import cn.yongnian.seckill.model.SeckillGoods;
 import cn.yongnian.seckill.model.SeckillGoodsExample;
 import cn.yongnian.seckill.result.CodeMessage;
 import cn.yongnian.seckill.vo.GoodsVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,6 +70,11 @@ public class GoodsService {
     }
 
 
+    /**
+     * 用于秒杀失败后, 抵消预减库存的影响
+     * @param goodsVo
+     * @return
+     */
     public boolean increaseStock(GoodsVo goodsVo) {
         SeckillGoods g = new SeckillGoods();
         g.setGoodsId(goodsVo.getId());

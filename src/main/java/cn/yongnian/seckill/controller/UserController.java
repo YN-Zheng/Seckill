@@ -7,7 +7,6 @@ import cn.yongnian.seckill.result.Result;
 import cn.yongnian.seckill.service.UserService;
 import cn.yongnian.seckill.utils.MD5Util;
 import cn.yongnian.seckill.utils.UUIDUtil;
-import cn.yongnian.seckill.vo.LoginVo;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,7 +25,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 登陆 Controller
+ * User Controller
+ * 辅助测试用，包括：
+ * 1.生成5000个用户，密码为123456
+ * 2. 更新这些用户的token
+ * ！！！！！！不要将该接口暴露！！！！！！！！！！！
  */
 
 @Controller
@@ -44,11 +45,11 @@ public class UserController {
 
     @RequestMapping("/info")
     @ResponseBody
-    public Result<User> info(Model model, User user) {
+    public Result<User> info(User user) {
         return Result.success(user);
     }
 
-
+/*
     @RequestMapping("/produce_user")
     @ResponseBody
     public Result<List<User>> produce(Model model) {
@@ -75,14 +76,20 @@ public class UserController {
         }
         return Result.success(users);
     }
+*/
 
-    @RequestMapping("/update_token")
+
+    /**
+     * 生成token,用于Jmeter测试
+     * @return
+     */
+/*    @RequestMapping("/update_token")
     @ResponseBody
-    public Result<List<User>> update(Model model) {
+    public Result<List<User>> update() {
         int produceNum = 5000;
         List<User> users = new ArrayList<>(produceNum);
 
-        /* 写入Txt文件 */
+        // 写入Txt文件
         File writename = new File("./token.txt"); // 相对路径，如果没有则要建立一个新的output。txt文件
         BufferedWriter out;
         try {
@@ -108,4 +115,5 @@ public class UserController {
         }
         return Result.success(users);
     }
+*/
 }

@@ -16,7 +16,7 @@ public class SeckillKey extends BasePrefix{
 
     public static SeckillKey isGoodsOver = new SeckillKey("go");
     public static SeckillKey getPath = new SeckillKey(60,"mp");
-
+    public static SeckillKey getVerifyCode = new SeckillKey(300,"vc");
 
 
 }

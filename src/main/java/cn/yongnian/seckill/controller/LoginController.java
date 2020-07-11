@@ -25,7 +25,8 @@ import static cn.yongnian.seckill.result.Result.success;
 
 /**
  * 登陆 Controller
- * TODO @Valid?
+ * LoginVo已经通过注解的方式被验证了（非空，是手机号）
+ * @Valid注解 ：JSR 303 Bean Validation TODO
  */
 
 @Controller

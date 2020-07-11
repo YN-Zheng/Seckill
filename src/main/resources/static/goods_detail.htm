@@ -43,13 +43,15 @@
                 <input id="remainSeconds" type="hidden"/>
             </td>
             <td>
-                <div class="form-inline">
-                    <img id="verifyCodeImage" width="80" height="32"/>
-                    <input id="verifyCode" class="form-control"/>
-                    <button class="btn btn-primary" type="submit" id="buyButton" onclick="getSeckillPath()">
-                        立即秒杀
-                    </button>
-                    <input name="goodsId" id="goodsId" type="hidden"/>
+                <div class="row">
+                    <div class="form-inline">
+                        <img id="verifyCodeImage" width="80" height="32" style="display:none" onclick="refreshVerifyCode()"/>
+                        <input id="verifyCode" class="form-control" style="display:none"/>
+                        <button class="btn btn-primary" type="submit" id="buyButton" onclick="getSeckillPath()">
+                            立即秒杀
+                        </button>
+                        <input name="goodsId" id="goodsId" type="hidden"/>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -80,13 +82,19 @@
             url: "/seckill/path",
             type: "GET",
             data: {
-                goodsId: goodsId
+                goodsId: goodsId,
+                verifyCode:$("#verifyCode").val(),
             },
             success: function (data) {
                 if (data.code == 0) {
                     var path = data.data;
                     doSeckill(path);
+                }else{
+                    layer.msg(data.msg);
                 }
+            },
+            error: function () {
+                layer.msg("客户端请求有误");
             }
         })
     }
@@ -202,13 +210,20 @@
                 clearTimeout(timeout);
             }
             $("#seckillTip").html("秒杀进行中");
-
+            $("#verifyCodeImage").attr("src","/seckill/verifyCode?goodsId="+$("#goodsId").val());
+            $("#verifyCodeImage").show();
+            $("#verifyCode").show();
 
         } else {//秒杀已经结束
             $("#buyButton").attr("disabled", true);
             $("#seckillTip").html("秒杀已经结束");
+            $("#verifyCodeImage").hide();
+            $("#verifyCode").hide();
         }
     }
+    function refreshVerifyCode(){
+        $("#verifyCodeImage").attr("src","/seckill/verifyCode?goodsId="+$("#goodsId").val()+"&timestampe="+new Date().getTime());
+     }
 
 </script>
 </html>

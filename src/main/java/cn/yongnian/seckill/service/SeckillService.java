@@ -16,7 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * TODO
@@ -81,5 +86,93 @@ public class SeckillService {
         }
         String pathOld = redisService.get(SeckillKey.getPath, "" + userId + "_" + goodsId, String.class);
         return path.equals(pathOld);
+    }
+
+    public BufferedImage createSeckillVerifyCode(User user, long goodsId) {
+        if(user==null || goodsId <=0){
+            return null;
+        }
+        int width = 80;
+        int height = 32;
+
+        // 创建背景
+        BufferedImage image = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+        Graphics g = image.getGraphics();
+        // 设置背景色
+        g.setColor(new Color(0xDCDCDC));
+        g.fillRect(0,0,width,height);
+        // 设置轮廓
+        g.setColor(Color.BLACK);
+        g.drawRect(0,0,width-1,height-1);
+        // 随机数
+        Random rdm  = new Random();
+        // 干扰点
+        for (int i = 0; i < 50; i++) {
+            int x = rdm.nextInt(width);
+            int y = rdm.nextInt(height);
+            g.drawOval(x,y,0,0);
+        }
+        // 产生随机code
+        String verifyCode = generateVerifyCode(rdm);
+        g.setColor(new Color(0,100,0));
+        g.setFont(new Font("Candara",Font.BOLD,24));
+        g.drawString(verifyCode,8,24);
+        g.dispose();
+
+        // 验证码结果存入Redis中
+        int rnd = calc(verifyCode);
+        redisService.set(SeckillKey.getVerifyCode,user.getId()+","+goodsId,rnd);
+
+        //输出图片
+        return image;
+
+    }
+
+    private int calc(String exp) {
+        try{
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("JavaScript");
+            return (Integer)engine.eval(exp);
+        }catch(Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    private static char[] ops = new char[]{'+','-','*'};
+    /**
+     * 生成随机算式
+     * + - *
+     * @param rdm
+     * @return
+     */
+    private String generateVerifyCode(Random rdm) {
+        int num1 = rdm.nextInt(10);
+        int num2 = rdm.nextInt(10);
+        int num3 = rdm.nextInt(10);
+        char op1 = ops[rdm.nextInt(3)];
+        char op2 = ops[rdm.nextInt(3)];
+        String exp = "" + num1 + op1 + num2 + op2 + num3;
+        return exp;
+    }
+
+    /**
+     * 秒杀验证
+     * @param user
+     * @param goodsId
+     * @param verifyCode
+     * @return
+     */
+    public boolean checkVerifyCode(User user, long goodsId, Integer verifyCode) {
+        if(user==null || goodsId <=0 || verifyCode == null){
+            return false;
+        }
+        Integer oldVerifyCode = redisService.get(SeckillKey.getVerifyCode, user.getId() + "," + goodsId, Integer.class);
+        if(oldVerifyCode == null || oldVerifyCode - verifyCode !=0){
+            return false;
+        }
+        // 验证成功, 在redis中清掉缓存
+        redisService.delete(SeckillKey.getVerifyCode, user.getId() + "," + goodsId);
+        return true;
     }
 }

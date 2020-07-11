@@ -3,7 +3,7 @@ package cn.yongnian.seckill.exception;
 import cn.yongnian.seckill.result.CodeMessage;
 
 /**
- * TODO
+ * 全局异常,含有codeMessage, 方便返回错误信息给客户端
  */
 public class GlobalException extends RuntimeException {
     public static final long serialVersionUID = 1L;

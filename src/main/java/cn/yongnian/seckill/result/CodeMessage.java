@@ -12,6 +12,8 @@ public enum  CodeMessage {
     SUCCESS(0,"success"),
     SERVER_ERROR(500100,"服务端异常"),
     BIND_ERROR(500101,"参数校验异常: %s"),
+    MISSING_ARGUMENT(500102,"前端参数传输异常"),
+    ACCESS_LIMIT_REACH(500103,"访问过于频繁"),
     //!!!不要直接用。用于填充参数用
     MODIFIED_ENUM(0,""),
 
@@ -31,7 +33,9 @@ public enum  CodeMessage {
     //秒杀模块 5005XX
     NO_STOCK(500501,"该商品无库存,秒杀结束"),
     REPEAT_SECKILL(500502,"您已经成功秒杀该商品, 不能重复购买" ),
-    WRONG_PATH(500503,"老实秒杀，不许开挂")
+    WRONG_PATH(500503,"老实秒杀，不许开挂"),
+    VERIFY_GENERATE_ERROR(500504,"生成验证码出错"),
+    VERIFY_ERROR(500505,"验证码错误。不许开挂。")
     ;
 
     private int code;

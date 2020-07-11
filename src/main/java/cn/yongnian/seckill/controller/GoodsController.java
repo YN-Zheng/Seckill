@@ -3,36 +3,31 @@ package cn.yongnian.seckill.controller;
 import cn.yongnian.seckill.model.User;
 import cn.yongnian.seckill.redis.GoodsKey;
 import cn.yongnian.seckill.redis.RedisService;
-import cn.yongnian.seckill.redis.UserKey;
 import cn.yongnian.seckill.result.Result;
 import cn.yongnian.seckill.service.GoodsService;
 import cn.yongnian.seckill.service.UserService;
 import cn.yongnian.seckill.vo.GoodsDetailVo;
 import cn.yongnian.seckill.vo.GoodsVo;
-import cn.yongnian.seckill.vo.LoginVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.WebContext;
-import org.thymeleaf.spring5.context.webflux.SpringWebFluxContext;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.util.StringUtils;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
- * 登陆 Controller
+ * 主要负责:
+ * 1. 商品列表(to_list)：缓存页面至Redis。60秒刷新一次
+ * 2. 商品详情(to_detail/id)：前后端分离，静态页面，浏览器缓存。通过AJAX异步查询数据，减少流量
+ *
  */
 
 @Controller
@@ -51,18 +46,6 @@ public class GoodsController {
     ThymeleafViewResolver thymeleafViewResolver;
 
 
-    /**
-     * 5000 * 10
-     * QPS:
-     * 1. 400
-     * 2.
-     *
-     * @param model
-     * @param user
-     * @param response
-     * @param request
-     * @return
-     */
     @RequestMapping(value = "/to_list", produces = "text/html")
     @ResponseBody
     // MODEL and User are both from ArgumentResolver
@@ -78,8 +61,6 @@ public class GoodsController {
         model.addAttribute("user", user);
         List<GoodsVo> goodsVos = goodsService.listGoodsVo();
         model.addAttribute("goods", goodsVos);
-//        System.out.println(System.currentTimeMillis());
-        // return "goods_list";
 
         //手动渲染
         IContext webContext = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
@@ -92,10 +73,7 @@ public class GoodsController {
 
     @RequestMapping(value = "/to_detail/{goodId}")
     @ResponseBody
-    public Result<GoodsDetailVo> toGoodDetail(Model model, User user,
-                                              HttpServletResponse response,
-                                              HttpServletRequest request,
-                                              @PathVariable("goodId") long goodsId) {
+    public Result<GoodsDetailVo> toGoodDetail(User user, @PathVariable("goodId") long goodsId) {
 
 
         GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
@@ -123,10 +101,9 @@ public class GoodsController {
         goods.setStatus(status);
         goods.setUser(user);
         return Result.success(goods);
-
     }
 
-
+/*
     @RequestMapping(value = "/to_detail2/{goodId}", produces = "text/html")
     @ResponseBody
     public String toGoodDetail2(Model model, User user,
@@ -175,6 +152,6 @@ public class GoodsController {
         return html;
 
     }
-
+*/
 
 }

@@ -1,3 +1,0 @@
-git pull
-mvn install
-mvn spring-boot:run

@@ -30,7 +30,7 @@ import static cn.yongnian.seckill.result.Result.success;
  */
 
 @Controller
-@RequestMapping("/login")
+@RequestMapping({"/login","/"})
 public class LoginController {
 
     @Autowired
@@ -38,7 +38,8 @@ public class LoginController {
 
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
-    @RequestMapping("/to_login")
+
+    @RequestMapping({"","/","/to_login"})
     public String toLogin() {
         return "login";
     }

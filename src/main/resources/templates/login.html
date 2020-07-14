@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>登录</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
     <!-- jquery -->
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <!-- jquery-validator -->
     <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
@@ -22,7 +22,7 @@
 </head>
 <body>
 
-<form name="loginForm" id="loginForm" method="post"  style="width:50%; margin:0 auto">
+<form name="loginForm" id="loginForm" method="post" style="width:50%; margin:0 auto">
 
     <h2 style="text-align:center; margin-bottom: 20px">用户登录</h2>
 
@@ -30,7 +30,8 @@
         <div class="row">
             <label class="form-label col-md-4">请输入手机号码</label>
             <div class="col-md-5">
-                <input id="mobile" name = "mobile" class="form-control" type="text" placeholder="手机号码" required="true"  minlength="11" maxlength="11" />
+                <input id="mobile" name="mobile" class="form-control" type="text" placeholder="手机号码" required="true"
+                       minlength="11" maxlength="11"/>
             </div>
             <div class="col-md-1">
             </div>
@@ -41,7 +42,8 @@
         <div class="row">
             <label class="form-label col-md-4">请输入密码</label>
             <div class="col-md-5">
-                <input id="password" name="password" class="form-control" type="password"  placeholder="密码" required="true" minlength="6" maxlength="16" />
+                <input id="password" name="password" class="form-control" type="password" placeholder="密码"
+                       required="true" minlength="6" maxlength="16"/>
             </div>
         </div>
     </div>
@@ -56,6 +58,11 @@
     </div>
 
 </form>
+<div style="color: #666;text-align: center;padding: 25px 25%;">
+    <div>
+        Copyright © 2020· <a href="https://github.com/YN-Zheng/Seckill">GitHub: YN-ZHENG</a>
+    </div>
+</div>
 </body>
 
 </html>

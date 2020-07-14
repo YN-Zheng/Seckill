@@ -75,7 +75,6 @@ public class RedisService {
             } else {
                 jedis.setex(realKey, expireSeconds, stringValue);
             }
-
             return true;
         } finally {
             returnToPool(jedis);

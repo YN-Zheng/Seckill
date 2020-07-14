@@ -92,7 +92,7 @@ public class SeckillService {
         if(user==null || goodsId <=0){
             return null;
         }
-        int width = 80;
+        int width = 100;
         int height = 32;
 
         // 创建背景

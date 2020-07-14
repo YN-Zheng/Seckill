@@ -4,8 +4,11 @@
 1. 基于Redis的分布式Session、页面静态化、（页面、URL、对象）缓存、预加载
 2. 基于RabbitMQ的异步下单
 3. 使用Jmeter测试：多用户并发下单场景
-
-重要参数：参考https://www.cnblogs.com/data2value/p/6220859.html
+4. 测试账户:
+    - 账号:10000000000~10000004999
+    - 密码:123456
+    
+并发重要参数：参考https://www.cnblogs.com/data2value/p/6220859.html
 
 
 ## 项目总结
@@ -56,3 +59,9 @@
 - 秒杀接口地址隐藏
 - 数学公式验证码
 - 接口防刷（拦截器）
+
+## 常用命令
+mybatis自动生成: mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
+
+
+
